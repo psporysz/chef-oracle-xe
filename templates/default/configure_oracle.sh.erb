@@ -1,16 +1,23 @@
 #!/usr/bin/expect
 
+set timeout -1
+exp_internal 600 # max 10 min
 spawn /etc/init.d/oracle-xe configure
-expect -re "Specify the HTTP port that will be used for Oracle" {
-	send "<%= @http_port %>\r"
-	expect -re "Specify a port that will be used for the database listener"
-	send "<%= @listener_port %>\r"
-	expect -re "Specify a password to be used for database accounts.*initial configuration:$"
-	send "<%= @sysdba_password %>\r"
-	expect -re "Confirm the password"
-	send "<%= @sysdba_password %>\r"
-	expect -re "to be started on boot"
-	send "y\r"
-	expect "Installation completed successfully."
-	expect eof
+expect {
+	-re "Specify the HTTP port that will be used for Oracle" {
+		send "<%= @http_port %>\r"
+		expect -re "Specify a port that will be used for the database listener"
+		send "<%= @listener_port %>\r"
+		expect -re "Specify a password to be used for database accounts.*initial configuration:$"
+		send "<%= @sysdba_password %>\r"
+		expect -re "Confirm the password"
+		send "<%= @sysdba_password %>\r"
+		expect -re "to be started on boot"
+		send "y\r"
+		expect -re "Installation completed successfully."
+		expect eof
+	}
+	-re "Oracle Database 11g Express Edition is already configured" {exit 0}
+	eof {exit 1}
+	timeout {exit 1}
 }
