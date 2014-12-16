@@ -74,7 +74,7 @@ bash 'fix /dev/shm problem' do
     mount -t tmpfs shmfs -o size=2048m /dev/shm
     sysctl kernel.shmmax=1073741824 
   }
-  not_if "grep -q '/media/shm' /etc/fstab"
+  not_if "grep '/dev/shm' /etc/fstab"
 end
 
 bash 'setup oracle user' do
