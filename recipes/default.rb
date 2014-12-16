@@ -65,12 +65,16 @@ end
 
 bash 'fix /dev/shm problem' do
   code %Q{
+    sed -i 's/  \\[ -e \\/dev\\/shm \\] || ln -s \\/run\\/shm \\/dev\\/shm/  mkdir -p \\/dev\\/shm/' /etc/init/mounted-dev.conf
+    echo "shm /dev/shm tmpfs size=2g 0 0" >> /etc/fstab
+
     umount /dev/shm
     rm /dev/shm -rf
     mkdir /dev/shm
     mount -t tmpfs shmfs -o size=2048m /dev/shm
     sysctl kernel.shmmax=1073741824 
   }
+  not_if "grep -q '/media/shm' /etc/fstab"
 end
 
 bash 'setup oracle user' do
